@@ -11,13 +11,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-/**
- * @ClassName BaseViewModel.java
- * @author usopp
- * @version 1.0.0
- * @Description TODO
- * @createTime 2022年09月15日 14:33:00
- */
 abstract class BaseViewModel<S : UiState, E : UiEvent, F : UiEffect> : ViewModel() {
 
     private val initialState: S by lazy { initialState() }
