@@ -3,9 +3,9 @@ package com.example.composetodo
 import com.example.mvi.BaseViewModel
 
 internal class MainViewModel :
-    BaseViewModel<MainActivityState, MainActivityEvent, MainActivityEffect>() {
-    override fun initialState(): MainActivityState {
-        return MainActivityState(
+    BaseViewModel<MainState, MainEvent, MainEffect>() {
+    override fun initialState(): MainState {
+        return MainState(
             navBarItems = listOf(
                 NavigationBarItems.Add,
                 NavigationBarItems.Favorite
@@ -14,13 +14,13 @@ internal class MainViewModel :
     }
 
     override suspend fun handleEvent(
-        event: MainActivityEvent,
-        state: MainActivityState
-    ): MainActivityState {
+        event: MainEvent,
+        state: MainState
+    ): MainState {
         return when (event) {
-            is MainActivityEvent.ClickNavigationItem -> {
+            is MainEvent.ClickNavigationItem -> {
                 sendEffect(
-                    MainActivityEffect.NavigateTo(
+                    MainEffect.NavigateTo(
                         event.navigationItem.route
                     )
                 )
