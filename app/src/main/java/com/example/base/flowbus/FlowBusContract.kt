@@ -1,3 +1,5 @@
 package com.example.base.flowbus
 
-internal interface BusEvent;
+interface BusEvent
+
+data class MainScreenToastEvent(val msg: String) : BusEvent

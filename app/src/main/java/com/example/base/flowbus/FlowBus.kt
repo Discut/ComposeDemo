@@ -1,9 +1,13 @@
 package com.example.base.flowbus
 
 import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -11,55 +15,67 @@ import kotlinx.coroutines.launch
 import java.util.concurrent.ConcurrentHashMap
 
 object FlowBus {
-    private var eventsMap = ConcurrentHashMap<Any, FlowBus<*, *>>()
-    private var stickEventsMap = ConcurrentHashMap<Any, FlowBus<*, *>>()
+    var eventsMap = ConcurrentHashMap<Any, FlowBus<out BusEvent>>()
+    var stickEventsMap = ConcurrentHashMap<Any, FlowBus<out BusEvent>>()
 
     /**
      * 获取事件流对象
      */
-    fun <T : Any, E : Any> with(key: T): FlowBus<T, E> {
+    inline fun <reified E : BusEvent> with(key: String = E::class.java.name): FlowBus<E> {
         eventsMap[key]?.apply {
-            return this as FlowBus<T, E>
+            return this as FlowBus<E>
         }
-        eventsMap[key] = FlowBus<T, E>(key)
-        return eventsMap[key] as FlowBus<T, E>
+        eventsMap[key] = FlowBus<E>(key)
+        return eventsMap[key] as FlowBus<E>
     }
 
     /**
      * 获取粘连事件流对象
      */
-    fun <T : Any, E : Any> withStick(key: T): StickFlowBus<T, E> {
+    inline fun <reified E : BusEvent> withStick(key: String = E::class.java.name): StickFlowBus<E> {
         stickEventsMap[key]?.apply {
-            return this as StickFlowBus<T, E>
+            return this as StickFlowBus<E>
         }
-        stickEventsMap[key] = StickFlowBus<T, E>(key)
-        return stickEventsMap[key] as StickFlowBus<T, E>
+        stickEventsMap[key] = StickFlowBus<E>(key)
+        return stickEventsMap[key] as StickFlowBus<E>
     }
 
 
-    open class FlowBus<T : Any, E>(private val key: T) : DefaultLifecycleObserver {
+    open class FlowBus<E>(private val key: String) : DefaultLifecycleObserver {
 
         private val _events: MutableSharedFlow<E> by lazy {
             obtainFlow()
         }
 
         val events = _events.asSharedFlow()
+
+        private lateinit var destroyObserver: () -> Unit
         internal open fun obtainFlow(): MutableSharedFlow<E> =
             MutableSharedFlow(0, 1, BufferOverflow.DROP_OLDEST)
 
-        fun register(lifecycleOwner: LifecycleOwner, action: (value: E) -> Unit) {
+        fun register(
+            lifecycleOwner: LifecycleOwner,
+            dispatcher: CoroutineDispatcher = Dispatchers.Main.immediate,
+            minActiveState: Lifecycle.State = Lifecycle.State.STARTED,
+            action: (value: E) -> Unit
+        ) {
+            // 观察当前上下文组件的生命周期
             lifecycleOwner.lifecycle.addObserver(this)
-            lifecycleOwner.lifecycleScope.launch {
-                events.collect {
-                    try {
-                        action(it)
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+            // 构建注销观察器的函数
+            destroyObserver = { lifecycleOwner.lifecycle.removeObserver(this) }
+            // 启动一个协程用于消费事件
+            lifecycleOwner.lifecycleScope.launch(dispatcher) {
+                lifecycleOwner.repeatOnLifecycle(minActiveState) {
+                    // 消费事件
+                    events.collect {
+                        try {
+                            action(it)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
                     }
                 }
             }
-            // 注册生命周期监听器，用于销毁数据防止内存泄漏
-            lifecycleOwner.lifecycle.addObserver(this)
         }
 
         suspend fun post(event: E) {
@@ -81,11 +97,13 @@ object FlowBus {
             val count = _events.subscriptionCount.value
             if (count <= 0) {
                 eventsMap.remove(key)
+                stickEventsMap.remove(key)
             }
+            destroyObserver()
         }
     }
 
-    class StickFlowBus<T : Any, E>(private val key: T) : FlowBus<T, E>(key) {
+    class StickFlowBus<E : BusEvent>(key: String) : FlowBus<E>(key) {
         override fun obtainFlow(): MutableSharedFlow<E> =
             MutableSharedFlow(1, 1, BufferOverflow.DROP_OLDEST)
     }
