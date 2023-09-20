@@ -176,7 +176,7 @@ private fun TodoListItem(
 
 @Composable
 private fun ContentWithProgress() {
-    Surface( modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize()) {
         Box(
             contentAlignment = Alignment.TopCenter
         ) {

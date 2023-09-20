@@ -1,5 +1,6 @@
 package com.example.composetodo
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,6 +37,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.base.flowbus.MainScreenToastEvent
+import com.example.base.flowbus.observeEven
 import com.example.composetodo.ui.component.CustomEdit
 import com.example.mvi.collectSideEffect
 
@@ -71,6 +75,11 @@ internal fun MainScreen(viewModel: MainViewModel = androidx.lifecycle.viewmodel.
             else -> {}
         }
     }
+
+    LocalLifecycleOwner.current.observeEven<MainScreenToastEvent> {
+        Toast.makeText(context, "get msg is ${it.msg}", Toast.LENGTH_SHORT).show()
+    }
+
     NavHost(navController = navControllerTop, startDestination = "main") {
         composable("main") {
             Scaffold(

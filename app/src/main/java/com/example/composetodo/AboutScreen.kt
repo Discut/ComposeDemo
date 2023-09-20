@@ -1,16 +1,32 @@
 package com.example.composetodo
 
 import android.annotation.SuppressLint
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.lifecycleScope
+import com.example.base.flowbus.FlowBus
+import com.example.base.flowbus.MainScreenToastEvent
 
 @SuppressLint("UnrememberedMutableState")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AboutScreen() {
-    Text(text = "About Me")
+
+    val scope = LocalLifecycleOwner.current.lifecycleScope
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Button(onClick = {
+            FlowBus.with<MainScreenToastEvent>().post(scope, MainScreenToastEvent("Hello world"))
+        }) {
+            Text(text = "通过FlowBus发送消息")
+        }
+    }
 }
 
 
