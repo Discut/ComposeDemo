@@ -103,13 +103,13 @@ fun CustomEdit(
                         // 点击就清空text
                         modifier = Modifier.clickable { onValueChange.invoke("") })
                 }
-                Icon(
+/*                Icon(
                     imageVector = Icons.Filled.Search,
                     contentDescription = null,
                     modifier = Modifier
                         .padding(start = 10.dp)
                         .clickable { }
-                )
+                )*/
             }
         }
     )

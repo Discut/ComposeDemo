@@ -74,7 +74,7 @@ internal fun AboutScreen2() {
         startIcon = Icons.Filled.ArrowBack,
         enabled = true,
         readOnly = false,
-        hint = "搜索应用",
+        hint = "More...",
         modifier = Modifier
             .fillMaxWidth()
             .padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 10.dp)

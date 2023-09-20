@@ -41,18 +41,7 @@ internal fun TodoScreen(
                 .show()
         }
     }
-/*    LaunchedEffect(Unit) {
-        viewModel.uiEffect.collect { effect ->
-            when (effect) {
-                is TodoEffect.Completed -> Toast.makeText(
-                    context,
-                    "${effect.text}已完成",
-                    Toast.LENGTH_SHORT
-                )
-                    .show()
-            }
-        }
-    }*/
+
     when {
         state.isLoading -> ContentWithProgress()
         state.todoList.isNotEmpty() -> TodoListContent(
@@ -187,12 +176,12 @@ private fun TodoListItem(
 
 @Composable
 private fun ContentWithProgress() {
-    Surface(color = Color.LightGray) {
+    Surface( modifier = Modifier.fillMaxSize()) {
         Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.TopCenter
         ) {
-            CircularProgressIndicator()
+            LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+//            CircularProgressIndicator()
         }
     }
 }

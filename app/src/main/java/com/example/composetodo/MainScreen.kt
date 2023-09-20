@@ -1,6 +1,5 @@
 package com.example.composetodo
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,6 +8,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -49,10 +50,6 @@ internal fun MainScreen(viewModel: MainViewModel = androidx.lifecycle.viewmodel.
     val navControllerTop = rememberNavController()
 
 
-    var isAbout by remember {
-        mutableStateOf(false)
-    }
-
     viewModel.collectSideEffect {
         when (it) {
             is MainEffect.NavigateTo -> navController.navigate(it.route) {
@@ -83,6 +80,7 @@ internal fun MainScreen(viewModel: MainViewModel = androidx.lifecycle.viewmodel.
                         onValueChange = {
                             searchText = it
                         },
+                        startIcon = Icons.Filled.Search,
                         hint = "More...",
                         modifier = Modifier
                             .fillMaxWidth()
@@ -101,7 +99,8 @@ internal fun MainScreen(viewModel: MainViewModel = androidx.lifecycle.viewmodel.
                                         restoreState = true
                                     }
                                 }
-                            }.clickable {  },
+                            }
+                            .clickable { },
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
                     )
                 },
