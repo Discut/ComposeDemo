@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mvi.collectSideEffect
+import com.example.mvi.CollectSideEffect
 
 @Composable
 internal fun TodoScreen(
@@ -31,7 +31,7 @@ internal fun TodoScreen(
     val state by viewModel.uiState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
-    viewModel.collectSideEffect { effect ->
+    viewModel.CollectSideEffect { effect ->
         when (effect) {
             is TodoEffect.Completed -> Toast.makeText(
                 context,

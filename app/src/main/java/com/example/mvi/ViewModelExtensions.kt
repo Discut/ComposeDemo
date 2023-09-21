@@ -17,7 +17,7 @@ import com.example.mvi.contract.*
 
 
 @Composable
-fun <S : UiState, E : UiEvent, F : UiEffect> BaseViewModel<S, E, F>.collectSideEffect(
+fun <S : UiState, E : UiEvent, F : UiEffect> BaseViewModel<S, E, F>.CollectSideEffect(
     lifecycleState: Lifecycle.State = Lifecycle.State.STARTED,
     sideEffect: (suspend (sideEffect: F) -> Unit),
 ) {
