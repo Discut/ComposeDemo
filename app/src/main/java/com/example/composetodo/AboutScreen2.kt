@@ -63,7 +63,7 @@ internal fun AboutScreen2() {
     }
     val context = LocalContext.current
 
-    LaunchedEffect(Unit){
+    LaunchedEffect(focusRequester){
         focusRequester.requestFocus()
     }
     CustomEdit(
